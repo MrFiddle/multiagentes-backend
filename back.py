@@ -30,31 +30,31 @@ if __name__ == '__main__':
             self.coordinates.append(coordinates)
         
     
-    initialPosition = [34, 10, 4]
-    car = Car(1, initialPosition)
-    print(car.getInitialPosition)
+    # initialPosition = [34, 10, 4]
+    # car = Car(1, initialPosition)
+    # print(car.getInitialPosition)
 
-    # @app.route('/cars', methods=['GET'])
-    # def getCars():
+    @app.route('/cars', methods=['GET'])
+    def getCars():
 
-    #     cars = []
-    #     carNumber = 20
-    #     counter = 1
+        cars = []
+        carNumber = 20
+        counter = 1
 
-    #     for i in range(carNumber):
+        for i in range(carNumber):
 
-    #         x = random.uniform(0, 100)
-    #         z = random.uniform(0, 100)
-    #         cars.append(Car("car" + str(counter),x, 0, z))
-    #         counter = counter + 1
+            x = random.uniform(0, 100)
+            z = random.uniform(0, 100)
+            cars.append(Car("car" + str(counter),x, 0, z))
+            counter = counter + 1
 
-    #         print(counter)
+            print(counter)
 
-    #     def createJson():
-    #         with open('cars.json', 'w') as f:
-    #             json.dump(cars, f, default=lambda o: o.__dict__, indent=4)
+        def createJson():
+            with open('cars.json', 'w') as f:
+                json.dump(cars, f, default=lambda o: o.__dict__, indent=4)
         
-    #     createJson()
-    #     return send_file('cars.json')
+        createJson()
+        return send_file('cars.json')
     
-    # app.run(debug=True, port=8000)
+    app.run(debug=True, port=8000)
