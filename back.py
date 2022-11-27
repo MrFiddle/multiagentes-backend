@@ -30,9 +30,9 @@ if __name__ == '__main__':
             self.coordinates.append(coordinates)
         
     
-    # initialPosition = [34, 10, 4]
-    # car = Car(1, initialPosition)
-    # print(car.getInitialPosition)
+    initialPosition = [34, 10, 4]
+    car = Car(1, initialPosition)
+    print(car.getInitialPosition)
 
     @app.route('/cars', methods=['GET'])
     def getCars():
