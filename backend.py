@@ -69,7 +69,10 @@ class stopLight(ap.Agent):
             return self.state            
         else:
             self.state=7
-            return self.state            
+            return self.state   
+    def forceRed(self):
+        self.state=7
+        return self.state
                 
             
     def save_json(self):
