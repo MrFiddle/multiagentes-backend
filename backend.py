@@ -158,6 +158,7 @@ class streetIntersection(ap.Model):
 
     
     def step(self):
+        doDesynch = random.choice([True,False])
 
         lightsCycles = self.t%self.lightCycle
 
@@ -179,13 +180,19 @@ class streetIntersection(ap.Model):
 
         # 5 green | 6 yellow | 7 red
 
-        if(self.horizontalCrossovers):
-            self.stopLights[1].condition=self.stopLights[1].stateChange(lightsCycles)
-            self.stopLights[3].condition=self.stopLights[3].stateChange(lightsCycles)
-
+        if(doDesynch):
+            # self.desynch_n-=1
+            self.stopLights.condition=self.stopLights.forceRed()
+            randomStopLight = random.choice(self.stopLights)
+            randomStopLight.condition=randomStopLight.stateChange(lightsCycles)
         else:
-            self.stopLights[2].condition=self.stopLights[2].stateChange(lightsCycles)
-            self.stopLights[0].condition=self.stopLights[0].stateChange(lightsCycles) 
+            if(self.horizontalCrossovers):
+                self.stopLights[1].condition=self.stopLights[1].stateChange(lightsCycles)
+                self.stopLights[3].condition=self.stopLights[3].stateChange(lightsCycles)
+
+            else:
+                self.stopLights[2].condition=self.stopLights[2].stateChange(lightsCycles)
+                self.stopLights[0].condition=self.stopLights[0].stateChange(lightsCycles) 
 
         # self.stopLights[1].condition = 7 # left light
         # self.stopLights[3].condition = 7 # right light
