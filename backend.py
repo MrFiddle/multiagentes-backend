@@ -334,10 +334,3 @@ class streetIntersection(ap.Model):
         json_file = json.dumps(self.data,indent=2)
         with open('data.json','w') as outfile:
             outfile.write(json_file)
-
-
-    
-
-
-
-
