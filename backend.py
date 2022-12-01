@@ -161,8 +161,8 @@ class streetIntersection(ap.Model):
 
     
     def step(self):
-        doDesynch = random.choice([True,False])
 
+        doDesynch = random.choice([True,False])
         lightsCycles = self.t%self.lightCycle
 
         if(lightsCycles==0 and self.horizontalCrossovers==True):
@@ -173,29 +173,33 @@ class streetIntersection(ap.Model):
         #we need to select and separate cars in different conditions as they move differently
 
         # left cars
-        moving_carsl = self.carsl.select(self.carsl.condition == 2)
+        moving_carsl = self.carsl.select(self.carsl)
         # up carsS
-        moving_carsu = self.carsu.select(self.carsu.condition == 1)
+        moving_carsu = self.carsu.select(self.carsu)
         # right cars
-        moving_carsr = self.carsr.select(self.carsr.condition == 3)
+        moving_carsr = self.carsr.select(self.carsr)
         # down cars
-        moving_carsd = self.carsd.select(self.carsd.condition == 4)
+        moving_carsd = self.carsd.select(self.carsd)
 
         # 5 green | 6 yellow | 7 red
 
-        if(doDesynch):
-            # self.desynch_n-=1
-            self.stopLights.condition=self.stopLights.forceRed()
-            randomStopLight = random.choice(self.stopLights)
-            randomStopLight.condition=randomStopLight.stateChange(lightsCycles)
-        else:
-            if(self.horizontalCrossovers):
-                self.stopLights[1].condition=self.stopLights[1].stateChange(lightsCycles)
-                self.stopLights[3].condition=self.stopLights[3].stateChange(lightsCycles)
+        # if(doDesynch):
+        #     # self.desynch_n-=1
+        #     self.stopLights.condition=self.stopLights.forceRed()
+        #     randomStopLight = random.choice(self.stopLights)
+        #     randomStopLight.condition=randomStopLight.stateChange(lightsCycles)
+        # else:
+        if(self.horizontalCrossovers):
+            self.stopLights[1].stateChange(lightsCycles)
+            self.stopLights[1].condition=self.stopLights[1].stateChange(lightsCycles)
+            self.stopLights[3].stateChange(lightsCycles)
+            self.stopLights[3].condition=self.stopLights[3].stateChange(lightsCycles)
 
-            else:
-                self.stopLights[2].condition=self.stopLights[2].stateChange(lightsCycles)
-                self.stopLights[0].condition=self.stopLights[0].stateChange(lightsCycles) 
+        else:
+            self.stopLights[2].stateChange(lightsCycles)
+            self.stopLights[2].condition=self.stopLights[2].stateChange(lightsCycles)
+            self.stopLights[0].stateChange(lightsCycles)
+            self.stopLights[0].condition=self.stopLights[0].stateChange(lightsCycles) 
 
         # self.stopLights[1].condition = 7 # left light
         # self.stopLights[3].condition = 7 # right light
@@ -203,9 +207,10 @@ class streetIntersection(ap.Model):
         # self.stopLights[2].condition = 7 # up light
         # self.stopLights[0].condition = 7 # down light
 
-
         # LEFT CARS
         for i, car in enumerate(moving_carsl):
+
+            m = movement1
 
             currentPos = self.street.positions[car] # get current position
 
@@ -218,26 +223,28 @@ class streetIntersection(ap.Model):
             if self.street.positions[car] == (13,8) and (7 in self.street.agents[12, 10].condition):
                 continue
 
-            if (len(self.street.agents[frontPos].condition) == 0 and len(self.street.agents[frontPos2].condition) == 0):
-                self.street.move_by(car, movement1) # move the car
 
-            # if self.street.positions[car] == (13,8) and (5 in self.street.agents[12, 10].condition):
-            #     random_turn = random.choice(turnPointCoordinatesLeft)
-            #     self.street.move_by(car,random_turn)
-            #     if(random_turn==turnPointCoordinatesLeft[1]):
-            #         car.condition=1 #car turns into a car from up
-            #     elif(random_turn==turnPointCoordinatesLeft[2]):
-            #         car.condition=4 #car turns into a car from down
+            if (self.leftDownTurn[i] == True) and (currentPos[1] == 11):
+                frontPos = (currentPos[0] + 1, currentPos[1]) # position of the possible car in front
+                frontPos2 = (currentPos[0] + 2, currentPos[1]) # position of the possible car in front
+                m = movement2
+                self.street.move_by(car, m)
 
+            elif(self.leftUpTurn[i]==True) and (currentPos[1]==13):
+                m = movement4
+                self.street.move_by(car, m)
             
+            else:
+                if (len(self.street.agents[frontPos].condition) == 0 and len(self.street.agents[frontPos2].condition) == 0):
+                    self.street.move_by(car, m) # move the car
 
-
-
-            if (currentPos[1]>=22):
+            if (currentPos[1]>=22) or (currentPos[0] >= 23) or (currentPos[0]<=0):
                 car.killAgent()
         
-        # up cars
-        for i, car2 in enumerate(moving_carsu):
+       
+        # UP CARS
+        for i,car2 in enumerate(moving_carsu):
+            m = movement2
 
             currentPos = self.street.positions[car2] # get current position
 
@@ -250,24 +257,27 @@ class streetIntersection(ap.Model):
             if self.street.positions[car2] == (8, 11) and (7 in self.street.agents[10, 12].condition):
                 continue
 
-            if (len(self.street.agents[frontPos].condition) == 0 and len(self.street.agents[frontPos2].condition) == 0):
-                self.street.move_by(car2, movement2)
-                
-            # if self.street.positions[car2] == (8, 11) and (5 in self.street.agents[10, 12].condition):
-            #     random_turn = random.choice(turnPointCoordinatesUp)
-            #     self.street.move_by(car2,random_turn)
-            #     if(random_turn==turnPointCoordinatesUp[1]):
-            #         car.condition=3 #car turns into a car from right
-            #     elif(random_turn==turnPointCoordinatesUp[2]):
-            #         car.condition=2 #car turns into a car from left
 
-            
-            if (currentPos[0] >= 22):
+            if (self.upLeftTurn[i] == True) and (currentPos[0] == 11):
+                frontPos = (currentPos[0] - 1, currentPos[1]) # position of the possible car in front
+                frontPos2 = (currentPos[0] - 2, currentPos[1]) # position of the possible car in front
+                m = movement3
+                self.street.move_by(car2, m) # move the car
+
+            elif(self.upRightTurn[i]==True) and (currentPos[0]==13):
+                m = movement1
+                self.street.move_by(car2, m) # move the car
+            else:
+                if (len(self.street.agents[frontPos].condition) == 0 and len(self.street.agents[frontPos2].condition) == 0):
+                    self.street.move_by(car2, m)
+
+
+            if (currentPos[0] >= 22) or (currentPos[1] <= 0) or (currentPos[1] >=23):
                 car2.killAgent()
             
 
         # right cars
-        for car3 in moving_carsr:
+        for i,car3 in enumerate(moving_carsr):
 
             currentPos = self.street.positions[car3] # get current position
 
@@ -277,28 +287,31 @@ class streetIntersection(ap.Model):
             if frontPos[0] < 1 or frontPos2[0] < 1:
                 continue
 
-            if self.street.positions[car3] == (11, 16)  and (7 in self.street.agents[12, 14].condition):
+            if currentPos == (11, 16)  and (7 in self.street.agents[12, 14].condition):
                 continue
 
-            if (len(self.street.agents[frontPos].condition) == 0 and len(self.street.agents[frontPos2].condition) == 0):
-                self.street.move_by(car3, movement3)
+            if (self.rightUpTurn[i] == True) and (currentPos[1] == 13):
+                frontPos = (currentPos[0] - 1, currentPos[1]) # position of the possible car in front
+                frontPos2 = (currentPos[0] - 2, currentPos[1]) # position of the possible car in front
+                m = movement4
+                self.street.move_by(car3, m) # move the car
 
-            # if self.street.positions[car3] == (11, 16)  and (5 in self.street.agents[12, 14].condition):
-            #     random_turn = random.choice(turnPointCoordinatesRight)
-            #     self.street.move_by(car3,random_turn)
-            #     if(random_turn==turnPointCoordinatesRight[1]):
-            #         car.condition=4 #car turns into a car from down
-            #     elif(random_turn==turnPointCoordinatesRight[2]):
-            #         car.condition=1 #car turns into a car from up
+            elif(self.rightDownTurn[i]==True) and (currentPos[1]==11):
+                m=movement2
+                self.street.move_by(car3, m) # move the car
+
+            else:
+                if (len(self.street.agents[frontPos].condition) == 0 and len(self.street.agents[frontPos2].condition) == 0):
+                    self.street.move_by(car3, movement3)
 
 
             
-            if (currentPos[1] <= 2):                
+            if (currentPos[1] <= 2) or (currentPos[0]<=1) or (currentPos[0]>=23):                
                 car3.killAgent()
  
         
         # down cars
-        for car4 in moving_carsd:
+        for i,car4 in enumerate(moving_carsd):
 
             currentPos = self.street.positions[car4]
 
@@ -309,17 +322,23 @@ class streetIntersection(ap.Model):
                 continue
             if self.street.positions[car4] == (16, 13) and (7 in self.street.agents[14, 12].condition):
                 continue
-            if (len(self.street.agents[frontPos].condition) == 0 and len(self.street.agents[frontPos2].condition) == 0):
-                self.street.move_by(car4, movement4)
-            # if self.street.positions[car4] == (16, 13) and (5 in self.street.agents[14, 12].condition):
-            #     random_turn = random.choice(turnPointCoordinatesDown)
-            #     self.street.move_by(car4,random_turn)
-            #     if(random_turn==turnPointCoordinatesDown[1]):
-            #         car.condition=2 #car turns into a car from left
-            #     elif(random_turn==turnPointCoordinatesDown[2]):
-            #         car.condition=3 #car turns into a car from right 
 
-            if (currentPos[0] <= 2):
+            if (self.downRightTurn[i] == True) and (currentPos[0] == 13):
+                frontPos = (currentPos[0] - 1, currentPos[1]) # position of the possible car in front
+                frontPos2 = (currentPos[0] - 2, currentPos[1]) # position of the possible car in front
+                m = movement1
+                self.street.move_by(car4, m) # move the car
+
+            elif(self.downLeftTurn==True) and (currentPos[0]==11):
+                m=movement3
+                self.street.move_by(car4, m) # move the car
+
+            else:
+                if (len(self.street.agents[frontPos].condition) == 0 and len(self.street.agents[frontPos2].condition) == 0):
+                    self.street.move_by(car4, movement4)
+
+
+            if (currentPos[0] <= 2) or (currentPos[1]>=24) or (currentPos[1]<=0):
                 car4.killAgent()
 
         self.save_json()
