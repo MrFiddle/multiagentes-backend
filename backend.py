@@ -45,7 +45,7 @@ stopLightPos = [(14,12),(12,10),(10,12),(12,14)]
 
 class Car(ap.Agent):
     def setup(self):
-        currentTrack = 0 #1: left track, 2:right track, 3:track going downwards, 4:track going upwards
+        self.currentSelf = 0
     def save_json(self):
         self.position =  self.model.street.positions[self]
         data = self.model.data
@@ -53,7 +53,7 @@ class Car(ap.Agent):
         data["steps"][self.model.t]["cars"].append({"x": self.position[0],"z":self.position[1]})
 
     def killAgent(self):
-        self.model.street.move_to(self,(0,0))
+        self.model.street.move_to(self,(-1,-1))
         self.condition = None
 
 
@@ -69,7 +69,8 @@ class stopLight(ap.Agent):
             return self.state            
         else:
             self.state=7
-            return self.state   
+            return self.state
+
     def forceRed(self):
         self.state=7
         return self.state
@@ -151,6 +152,22 @@ class streetIntersection(ap.Model):
         
         self.stopLights.condition = self.stopLights.state
 
+        #Cars coming from the top
+        self.upLeftTurn = [random.choice([True, False]) for i in range(len(self.carsl))]
+        self.upRightTurn = [random.choice([True, False]) for i in range(len(self.carsl))]
+
+        #Cars coming from the bottom
+        self.downLeftTurn = [random.choice([True, False]) for i in range(len(self.carsl))]
+        self.downRightTurn = [random.choice([True, False]) for i in range(len(self.carsl))]
+
+        #Cars coming  from the left
+        self.leftUpTurn = [random.choice([True, False]) for i in range(len(self.carsl))]
+        self.leftDownTurn = [random.choice([True, False]) for i in range(len(self.carsl))]
+
+        #Cars coming from the right 
+        self.rightUpTurn = [random.choice([True, False]) for i in range(len(self.carsl))]
+        self.rightDownTurn = [random.choice([True, False]) for i in range(len(self.carsl))]
+
 
 
         self.save_json()
@@ -158,6 +175,8 @@ class streetIntersection(ap.Model):
 
 
         self.horizontalCrossovers = True
+        self.desynch_n = self.p.desynchs_n
+        
 
     
     def step(self):

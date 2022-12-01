@@ -1,6 +1,5 @@
 import json
 from flask import Flask, request, jsonify, send_file
-import backend
 from backend import streetIntersection
 
 app = Flask(__name__)
@@ -12,7 +11,8 @@ def helloWorld():
         'steps': 200,
         'n_cars': request.args.get('n_cars', default=4, type=int),
         'greenDuration': 10,
-        'redDuration': 15
+        'redDuration': 15,
+        'desynchs_n':4
     }
 
     street = streetIntersection(parameters)
